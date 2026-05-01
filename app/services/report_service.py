@@ -33,6 +33,27 @@ async def _fetch_all() -> tuple[list[RepoItem], list[str]]:
     return all_repos, sources
 
 
+def _report_to_out(report: DailyReport) -> DailyReportOut:
+    """ORM 转 Pydantic，处理 sources 字符串→列表，raw_data JSON→items"""
+    items = []
+    if report.raw_data:
+        try:
+            raw = json.loads(report.raw_data)
+            items = [RepoItem(**r) for r in raw]
+        except (json.JSONDecodeError, TypeError, ValueError) as e:
+            print(f"[warn] failed to parse raw_data for report {report.id}: {e}")
+    return DailyReportOut(
+        id=report.id,
+        date=report.date,
+        title=report.title or "",
+        summary=report.summary,
+        items=items,
+        repo_count=report.repo_count,
+        sources=report.sources.split(",") if report.sources else [],
+        created_at=report.created_at,
+    )
+
+
 async def generate_today_report(session: AsyncSession) -> DailyReportOut:
     today = date.today().isoformat()
 
@@ -51,7 +72,7 @@ async def generate_today_report(session: AsyncSession) -> DailyReportOut:
     session.add(report)
     await session.commit()
     await session.refresh(report)
-    return DailyReportOut.model_validate(report)
+    return _report_to_out(report)
 
 
 async def get_reports(
@@ -66,7 +87,7 @@ async def get_reports(
     stmt = stmt.offset(skip).limit(limit)
     result = await session.execute(stmt)
     reports = result.scalars().all()
-    return [DailyReportOut.model_validate(r) for r in reports]
+    return [_report_to_out(r) for r in reports]
 
 
 async def count_reports(session: AsyncSession, q: str = "") -> int:
@@ -83,7 +104,7 @@ async def get_report_by_date(
     stmt = select(DailyReport).where(DailyReport.date == date_str)
     result = await session.execute(stmt)
     report = result.scalar_one_or_none()
-    return DailyReportOut.model_validate(report) if report else None
+    return _report_to_out(report) if report else None
 
 
 async def get_trends(session: AsyncSession, days: int = 30) -> dict:

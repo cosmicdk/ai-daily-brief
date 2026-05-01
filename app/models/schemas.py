@@ -26,6 +26,7 @@ class DailyReportOut(BaseModel):
     date: str
     title: str = ""
     summary: str
+    items: list[RepoItem] = []
     repo_count: int = 0
     sources: list[str] = []
     created_at: datetime

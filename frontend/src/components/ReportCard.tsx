@@ -1,6 +1,8 @@
 import { DailyReport } from '../types';
 import RepoCard from './RepoCard';
 import { Calendar, Clock, Database } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function ReportCard({
   report,
@@ -47,8 +49,10 @@ export default function ReportCard({
       {/* 内容 */}
       <div className="px-4 pb-4 space-y-4">
         {report.summary && (
-          <div className="bg-gray-800/50 rounded-lg p-3 text-sm text-gray-300 leading-relaxed">
-            {report.summary}
+          <div className="bg-gray-800/50 rounded-lg p-4 text-sm text-gray-300 leading-relaxed prose prose-invert max-w-none">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {report.summary}
+            </ReactMarkdown>
           </div>
         )}
         <div className="grid gap-3">

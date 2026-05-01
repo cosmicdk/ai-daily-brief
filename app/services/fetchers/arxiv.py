@@ -8,7 +8,7 @@ ARXIV_CATEGORIES = ["cs.AI", "cs.LG", "cs.CL", "cs.CV", "cs.MA", "cs.RO", "stat.
 async def fetch_arxiv_papers() -> list[RepoItem]:
     """从 ArXiv 获取热门 AI 论文"""
     query = "+OR+".join(f"cat:{c}" for c in ARXIV_CATEGORIES)
-    url = f"http://export.arxiv.org/api/query?search_query={query}&sortBy=submittedDate&sortOrder=descending&max_results=20"
+    url = f"https://export.arxiv.org/api/query?search_query={query}&sortBy=submittedDate&sortOrder=descending&max_results=20"
 
     headers = {"Accept": "application/atom+xml"}
 

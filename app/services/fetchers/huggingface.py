@@ -19,7 +19,7 @@ async def fetch_huggingface_models() -> list[RepoItem]:
                 name=item.get("modelId", item["id"]),
                 owner=item["id"].split("/")[0] if "/" in item["id"] else "unknown",
                 url=f"https://huggingface.co/{item['id']}",
-                description=item.get("description"),
+                description=item.get("description") or "",
                 stars=item.get("downloads", 0),
                 forks=item.get("likes", 0),
                 language=None,
