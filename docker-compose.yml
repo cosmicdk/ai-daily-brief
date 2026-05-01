@@ -1,0 +1,13 @@
+# 手动创建 data 目录
+# mkdir -p data
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DB_URL=sqlite+aiosqlite:///app/data/daily_brief.db
+    restart: unless-stopped
