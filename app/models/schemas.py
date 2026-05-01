@@ -11,6 +11,8 @@ class RepoItem(BaseModel):
     stars: int = 0
     forks: int = 0
     language: Optional[str] = None
+    source: str = "github"
+    extra_tags: list[str] = []
     updated_at: Optional[str] = None
 
 
@@ -20,6 +22,7 @@ class DailyReportOut(BaseModel):
     summary: str
     repo_count: int
     created_at: datetime
+    sources: list[str] = []
 
     model_config = {"from_attributes": True}
 
