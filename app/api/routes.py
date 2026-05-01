@@ -1,4 +1,11 @@
-from fastapi import APIRouter, Depends, Query, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import (
+    APIRouter,
+    Depends,
+    Query,
+    HTTPException,
+    WebSocket,
+    WebSocketDisconnect,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_session
 from app.models.schemas import DailyReportOut, DailyReportList
@@ -25,6 +32,7 @@ async def list_reports(
 @router.get("/today", response_model=DailyReportOut)
 async def get_today_report(session: AsyncSession = Depends(get_session)):
     from datetime import date
+
     report = await report_service.get_report_by_date(session, date.today().isoformat())
     if not report:
         raise HTTPException(status_code=404, detail="今日日报尚未生成")
@@ -34,12 +42,14 @@ async def get_today_report(session: AsyncSession = Depends(get_session)):
 @router.post("/generate", response_model=DailyReportOut)
 async def generate_report(session: AsyncSession = Depends(get_session)):
     from datetime import date
-    existing = await report_service.get_report_by_date(session, date.today().isoformat())
+
+    existing = await report_service.get_report_by_date(
+        session, date.today().isoformat()
+    )
     if existing:
         raise HTTPException(status_code=409, detail="今日日报已存在")
     report = await report_service.generate_today_report(session)
     # 广播给 WebSocket 客户端
-    import json
     dead = []
     for ws in ws_connections:
         try:

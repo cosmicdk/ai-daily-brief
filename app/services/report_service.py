@@ -42,6 +42,7 @@ async def generate_today_report(session: AsyncSession) -> DailyReportOut:
 
     report = DailyReport(
         date=today,
+        title=f"AI 日报 - {today}",
         summary=summary,
         raw_data=raw_data,
         repo_count=len(repos),
@@ -76,7 +77,9 @@ async def count_reports(session: AsyncSession, q: str = "") -> int:
     return result.scalar() or 0
 
 
-async def get_report_by_date(session: AsyncSession, date_str: str) -> DailyReportOut | None:
+async def get_report_by_date(
+    session: AsyncSession, date_str: str
+) -> DailyReportOut | None:
     stmt = select(DailyReport).where(DailyReport.date == date_str)
     result = await session.execute(stmt)
     report = result.scalar_one_or_none()
@@ -86,8 +89,13 @@ async def get_report_by_date(session: AsyncSession, date_str: str) -> DailyRepor
 async def get_trends(session: AsyncSession, days: int = 30) -> dict:
     """获取趋势统计数据"""
     from datetime import timedelta
+
     start = date.today() - timedelta(days=days)
-    stmt = select(DailyReport).where(DailyReport.date >= start.isoformat()).order_by(DailyReport.date)
+    stmt = (
+        select(DailyReport)
+        .where(DailyReport.date >= start.isoformat())
+        .order_by(DailyReport.date)
+    )
     result = await session.execute(stmt)
     reports = result.scalars().all()
 

@@ -12,6 +12,7 @@ dependencies = [
     "pydantic>=2.0",
     "pydantic-settings>=2.0",
     "pytz>=2024",
+    "asyncpg>=0.31.0",
 ]
 
 [project.optional-dependencies]
@@ -19,8 +20,14 @@ dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.24",
     "httpx>=0.28",
+    "ruff>=0.4",
 ]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.12",
+]

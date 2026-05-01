@@ -3,7 +3,9 @@ from pydantic import Field
 
 
 class Settings(BaseSettings):
-    db_url: str = "sqlite+aiosqlite:///./data/daily_brief.db"
+    db_url: str = (
+        "postgresql+asyncpg://dailybrief:dailybrief123@localhost:5432/dailybrief"
+    )
     github_token: str = Field(default="", alias="GITHUB_TOKEN")
     github_search_query: str = "topic:ai stars:>1000"
     github_per_page: int = 15

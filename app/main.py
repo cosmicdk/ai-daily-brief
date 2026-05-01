@@ -2,7 +2,6 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from pathlib import Path
 from sqlalchemy import select, func
@@ -40,8 +39,11 @@ app.include_router(router, prefix="/api/v1")
 
 # SPA fallback: 静态文件通过自定义路由服务
 frontend_dist = Path(__file__).resolve().parent.parent / "frontend" / "dist"
-ASSET_PATHS = {"/" + str(p.relative_to(frontend_dist)): p
-               for p in (frontend_dist / "assets").rglob("*") if p.is_file()}
+ASSET_PATHS = {
+    "/" + str(p.relative_to(frontend_dist)): p
+    for p in (frontend_dist / "assets").rglob("*")
+    if p.is_file()
+}
 
 if (frontend_dist / "favicon.svg").exists():
     ASSET_PATHS["/favicon.svg"] = frontend_dist / "favicon.svg"

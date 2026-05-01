@@ -2,9 +2,7 @@ import httpx
 from app.models.schemas import RepoItem
 
 
-ARXIV_CATEGORIES = [
-    "cs.AI", "cs.LG", "cs.CL", "cs.CV", "cs.MA", "cs.RO", "stat.ML"
-]
+ARXIV_CATEGORIES = ["cs.AI", "cs.LG", "cs.CL", "cs.CV", "cs.MA", "cs.RO", "stat.ML"]
 
 
 async def fetch_arxiv_papers() -> list[RepoItem]:
@@ -21,17 +19,19 @@ async def fetch_arxiv_papers() -> list[RepoItem]:
 
     repos = []
     for entry in _parse_arxiv_entries(text)[:15]:
-        repos.append(RepoItem(
-            name=entry["title"],
-            owner=",".join(a["name"] for a in entry.get("authors", [])),
-            url=entry["id"],
-            description=entry.get("summary", "")[:300],
-            stars=0,
-            forks=0,
-            language=None,
-            source="arxiv",
-            extra_tags=[c["term"] for c in entry.get("categories", [])],
-        ))
+        repos.append(
+            RepoItem(
+                name=entry["title"],
+                owner=",".join(a["name"] for a in entry.get("authors", [])),
+                url=entry["id"],
+                description=entry.get("summary", "")[:300],
+                stars=0,
+                forks=0,
+                language=None,
+                source="arxiv",
+                extra_tags=[c["term"] for c in entry.get("categories", [])],
+            )
+        )
     return repos
 
 
@@ -40,10 +40,13 @@ def _parse_arxiv_entries(xml_text: str) -> list[dict]:
     entries = []
     for raw in xml_text.split("<entry>")[1:]:
         entry = raw.split("</entry>")[0]
+
         def extract(tag):
             import re
+
             m = re.search(f"<{tag}[^>]*>(.*?)</{tag}>", entry, re.DOTALL)
             return m.group(1).strip() if m else ""
+
         entry_data = {
             "id": extract("id"),
             "title": extract("title").replace("\n", " ").strip(),
@@ -54,6 +57,7 @@ def _parse_arxiv_entries(xml_text: str) -> list[dict]:
         for a in entry.split("<author>")[1:]:
             aname = a.split("</author>")[0]
             import re
+
             m = re.search(r"<name>(.*?)</name>", aname)
             if m:
                 authors.append({"name": m.group(1).strip()})
@@ -63,6 +67,7 @@ def _parse_arxiv_entries(xml_text: str) -> list[dict]:
         for c in entry.split("<category")[1:]:
             c = c.split(">")[0]
             import re
+
             m = re.search(r'term="([^"]+)"', c)
             if m:
                 cats.append({"term": m.group(1)})

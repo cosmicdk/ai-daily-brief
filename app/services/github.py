@@ -1,4 +1,3 @@
-import json
 import httpx
 from app.core.config import settings
 from app.models.schemas import RepoItem
@@ -28,16 +27,18 @@ async def fetch_trending_repos() -> list[RepoItem]:
 
     repos = []
     for item in data.get("items", []):
-        repos.append(RepoItem(
-            name=item["full_name"],
-            owner=item["owner"]["login"],
-            url=item["html_url"],
-            description=item.get("description"),
-            stars=item["stargazers_count"],
-            forks=item["forks_count"],
-            language=item.get("language"),
-            updated_at=item.get("updated_at"),
-        ))
+        repos.append(
+            RepoItem(
+                name=item["full_name"],
+                owner=item["owner"]["login"],
+                url=item["html_url"],
+                description=item.get("description"),
+                stars=item["stargazers_count"],
+                forks=item["forks_count"],
+                language=item.get("language"),
+                updated_at=item.get("updated_at"),
+            )
+        )
     return repos
 
 

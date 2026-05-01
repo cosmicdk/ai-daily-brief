@@ -28,7 +28,10 @@ async def generate_llm_summary(repos: list[RepoItem]) -> str:
     payload = {
         "model": settings.llm_model or "deepseek-chat",
         "messages": [
-            {"role": "system", "content": "你是一个技术简报编辑，输出简洁专业的中文摘要。"},
+            {
+                "role": "system",
+                "content": "你是一个技术简报编辑，输出简洁专业的中文摘要。",
+            },
             {"role": "user", "content": LLM_SUMMARY_PROMPT.format(data=data)},
         ],
         "temperature": 0.3,

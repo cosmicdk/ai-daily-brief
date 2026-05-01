@@ -23,23 +23,35 @@ async def fetch_hackernews() -> list[RepoItem]:
     for item in items:
         title = item.get("title", "")
         # 只保留 AI 相关
-        ai_keywords = ["ai", "llm", "gpt", "neural", "deep learning",
-                       "machine learning", "transformer", "openai",
-                       "anthropic", "claude", "gemini"]
+        ai_keywords = [
+            "ai",
+            "llm",
+            "gpt",
+            "neural",
+            "deep learning",
+            "machine learning",
+            "transformer",
+            "openai",
+            "anthropic",
+            "claude",
+            "gemini",
+        ]
         if not any(kw in title.lower() for kw in ai_keywords):
             continue
 
         url = item.get("url") or f"https://news.ycombinator.com/item?id={item['id']}"
-        repos.append(RepoItem(
-            name=title[:120],
-            owner=item.get("by", "unknown"),
-            url=url,
-            description=f"HN points: {item.get('score', 0)} | comments: {item.get('descendants', 0)}",
-            stars=item.get("score", 0),
-            forks=item.get("descendants", 0),
-            language=None,
-            source="hackernews",
-        ))
+        repos.append(
+            RepoItem(
+                name=title[:120],
+                owner=item.get("by", "unknown"),
+                url=url,
+                description=f"HN points: {item.get('score', 0)} | comments: {item.get('descendants', 0)}",
+                stars=item.get("score", 0),
+                forks=item.get("descendants", 0),
+                language=None,
+                source="hackernews",
+            )
+        )
         if len(repos) >= 10:
             break
 
