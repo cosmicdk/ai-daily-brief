@@ -1,8 +1,11 @@
 import { DailyReport } from '../types';
 import RepoCard from './RepoCard';
-import { Calendar, Clock, Database } from 'lucide-react';
+import { Calendar, Clock, Database, ChevronLeft, ChevronRight } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useState } from 'react';
+
+const PAGE_SIZE = 10;
 
 export default function ReportCard({
   report,
@@ -11,10 +14,14 @@ export default function ReportCard({
   report: DailyReport;
   defaultExpanded?: boolean;
 }) {
+  const [page, setPage] = useState(0);
+  const totalPages = Math.ceil(report.items.length / PAGE_SIZE);
+  const pagedItems = report.items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
   return (
     <details
       open={defaultExpanded}
       className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden group"
+      onToggle={(e) => { if (!(e.target as HTMLDetailsElement).open) setPage(0); }}
     >
       <summary className="p-4 cursor-pointer hover:bg-gray-800/50 transition-colors list-none flex items-center justify-between">
         <div className="flex-1 min-w-0">
@@ -56,10 +63,32 @@ export default function ReportCard({
           </div>
         )}
         <div className="grid gap-3">
-          {report.items.map((item, i) => (
+          {pagedItems.map((item, i) => (
             <RepoCard key={`${item.name}-${i}`} item={item} />
           ))}
         </div>
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <button
+              onClick={() => setPage(Math.max(0, page - 1))}
+              disabled={page === 0}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft size={14} /> 上一页
+            </button>
+            <span className="text-sm text-gray-500">
+              {page + 1} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
+              disabled={page >= totalPages - 1}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              下一页 <ChevronRight size={14} />
+            </button>
+          </div>
+        )}
       </div>
     </details>
   );
