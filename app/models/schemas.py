@@ -8,9 +8,13 @@ class RepoItem(BaseModel):
     url: str
     description: str = ""
     stars: int = 0
+    forks: int = 0
+    owner: str = ""
     language: Optional[str] = None
     source: str = "github"
     extra_tags: list[str] = []
+    trend_badge: str = ""
+    updated_at: Optional[str] = None
 
 
 class DailyReportCreate(BaseModel):

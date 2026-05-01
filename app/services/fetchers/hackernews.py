@@ -50,9 +50,10 @@ async def fetch_hackernews() -> list[RepoItem]:
                 forks=item.get("descendants", 0),
                 language=None,
                 source="hackernews",
+                updated_at=str(item.get("time", "")),
             )
         )
-        if len(repos) >= 10:
+        if len(repos) >= 6:
             break
 
     return repos

@@ -25,3 +25,30 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #64748b;
 }
+
+/* 马克笔高亮效果 — 用于 AI 摘要中的项目名 */
+.prose strong,
+.markdown-body strong {
+  background: linear-gradient(120deg, rgba(250, 204, 21, 0.3) 0%, rgba(250, 204, 21, 0.3) 40%, transparent 80%);
+  padding: 0 4px;
+  color: #fef3c7;
+  font-weight: 700;
+  border-radius: 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* 今日焦点中的强强调 */
+.prose strong.spotlight,
+.markdown-body strong.spotlight {
+  background: linear-gradient(120deg, rgba(59, 130, 246, 0.35) 0%, rgba(59, 130, 246, 0.35) 40%, transparent 80%);
+  color: #bfdbfe;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; max-height: 0; }
+  to   { opacity: 1; max-height: 500px; }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}

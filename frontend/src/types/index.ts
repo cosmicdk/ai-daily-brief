@@ -3,9 +3,13 @@ export interface RepoItem {
   url: string;
   description: string;
   stars: number;
+  forks: number;
+  owner: string;
   language?: string;
   source: string;
   extra_tags: string[];
+  trend_badge: string;
+  updated_at?: string;
 }
 
 export interface DailyReport {

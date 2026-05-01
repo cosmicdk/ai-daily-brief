@@ -7,7 +7,7 @@ async def fetch_huggingface_models() -> list[RepoItem]:
     async with httpx.AsyncClient(timeout=15) as client:
         resp = await client.get(
             "https://huggingface.co/api/models",
-            params={"sort": "downloads", "direction": -1, "limit": 15},
+            params={"sort": "downloads", "direction": -1, "limit": 8},
         )
         resp.raise_for_status()
         data = resp.json()
@@ -25,6 +25,7 @@ async def fetch_huggingface_models() -> list[RepoItem]:
                 language=None,
                 source="huggingface",
                 extra_tags=item.get("tags", []),
+                updated_at=item.get("lastModified", ""),
             )
         )
     return repos

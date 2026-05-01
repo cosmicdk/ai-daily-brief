@@ -18,7 +18,7 @@ async def fetch_arxiv_papers() -> list[RepoItem]:
         text = resp.text
 
     repos = []
-    for entry in _parse_arxiv_entries(text)[:15]:
+    for entry in _parse_arxiv_entries(text)[:8]:
         repos.append(
             RepoItem(
                 name=entry["title"],
@@ -30,6 +30,7 @@ async def fetch_arxiv_papers() -> list[RepoItem]:
                 language=None,
                 source="arxiv",
                 extra_tags=[c["term"] for c in entry.get("categories", [])],
+                updated_at=entry.get("published", ""),
             )
         )
     return repos
@@ -51,6 +52,7 @@ def _parse_arxiv_entries(xml_text: str) -> list[dict]:
             "id": extract("id"),
             "title": extract("title").replace("\n", " ").strip(),
             "summary": extract("summary").replace("\n", " ").strip(),
+            "published": extract("published"),
         }
         # authors
         authors = []
