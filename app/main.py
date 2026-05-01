@@ -1,6 +1,10 @@
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, JSONResponse
+from pathlib import Path
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import init_db, get_session
@@ -20,11 +24,40 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="AI Daily Brief",
     description="GitHub AI 热门项目每日简报",
-    version="0.2.0",
+    version="0.3.0",
     lifespan=lifespan,
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(router, prefix="/api/v1")
+
+# SPA fallback: 静态文件通过自定义路由服务
+frontend_dist = Path(__file__).resolve().parent.parent / "frontend" / "dist"
+ASSET_PATHS = {"/" + str(p.relative_to(frontend_dist)): p
+               for p in (frontend_dist / "assets").rglob("*") if p.is_file()}
+
+if (frontend_dist / "favicon.svg").exists():
+    ASSET_PATHS["/favicon.svg"] = frontend_dist / "favicon.svg"
+
+
+@app.exception_handler(404)
+async def spa_fallback(request: Request, exc):
+    path = request.url.path
+    if path.startswith("/api/") or path == "/health":
+        return JSONResponse({"detail": "Not Found"}, status_code=404)
+    # 尝试返回静态文件
+    if path in ASSET_PATHS:
+        return FileResponse(str(ASSET_PATHS[path]))
+    if frontend_dist.exists() and (frontend_dist / "index.html").exists():
+        return FileResponse(str(frontend_dist / "index.html"))
+    return JSONResponse({"detail": "Not Found"}, status_code=404)
 
 
 @app.get("/health")
@@ -45,7 +78,7 @@ async def health(session: AsyncSession = Depends(get_session)):
 
     return {
         "status": "ok",
-        "version": "0.2.0",
+        "version": "0.3.0",
         "uptime_seconds": round(uptime),
         "database": db_status,
         "total_reports": total,
